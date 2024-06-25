@@ -1,12 +1,33 @@
-
+import glob
 def main():
-    with open("books/frankenstein.txt") as f:
+    options = glob.glob("books/*")
+    selection = selectText(options)
+    with open(options[selection]) as f:
         file_contents = f.read()
 
         # Manipulation
-        createReport(file_contents, getTotal=True, getChar=True, getWord=True)
+        createReport(options[selection], file_contents, getTotal=True, getChar=True, getWord=True)
 
-    
+def selectText(options):
+    selection = None
+
+    input_message = "Pick an option:\n"
+
+    for index, option in enumerate(options):
+        input_message += f'{index + 1}) {option}\n'
+
+    input_message += "Your choice (select a number): "
+
+    while selection is None:
+        _selection = int(input(input_message)) - 1
+
+        if options[_selection] in options:
+            selection = _selection
+
+    print("You picked: " + options[int(selection)])
+
+    return selection
+
 def getTotalWordCount(fc):
     return len(fc.split())
 
@@ -37,8 +58,9 @@ def getWordUsage(fc):
             words[word] = 1
     return words
 
-def createReport(fc, getTotal = False, getChar = False, getWord = False):
-    f = open("report.txt", "a")
+def createReport(fn, fc, getTotal = False, getChar = False, getWord = False):
+    text = fn.replace("books/", "").replace(".txt", "")
+    f = open(f'{text}-report.txt', "a")
     values = {
         "total": getTotalWordCount(fc) if getTotal else None,
         "charCount": getCharCount(fc, alphabetOnly=True) if getChar else None,
@@ -63,4 +85,5 @@ def createReport(fc, getTotal = False, getChar = False, getWord = False):
         for k, v in values["wordCount"].items():
             f.write('"' + k + '"' + " is written " + str(v) + " times.\n")
 
+    print("Report Created Successfully.")
 main()
